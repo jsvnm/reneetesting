@@ -24,9 +24,10 @@ class MyApp < Renee::Application
       puts "in post!"
       if request['title'] && request['contents']
         p=Post.create(title: request['title'], contents: request['contents'])
-        redirect "/#{p.id}"
+        #redirect "/#{p.id}"
+        halt :ok
       else
-        halt :bad_request
+        halt "VAMMA"
       end
     }
     
