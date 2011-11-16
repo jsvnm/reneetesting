@@ -1,0 +1,12 @@
+doctype html
+html
+  head
+    title Renee FTW - Editing #{@post.title}
+  body
+    form action="/" method="post"
+      | Title
+      input name="title" value=@post.title
+      br
+      textarea name="contents" = @post.contents
+      br
+      input type="submit" value="Update"
