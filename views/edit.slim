@@ -3,7 +3,7 @@ html
   head
     title Renee FTW - Editing #{@post.title}
   body
-    form action="/" method="post"
+    form action="/#{post.id}" method="post"
       | Title
       input name="title" value=@post.title
       br

@@ -6,12 +6,14 @@ require 'model'
 class MyApp < Renee::Application
   app do
     var :integer do |id|
-      halt 404 unless @post = Post.get(id)
+      puts "id is #{id}"
+      halt 404 unless @post = Post[id]
       
-    path('edit') { render! 'edit' }
+      path('edit') { render! 'edit' }
       get          { render! 'show' }
-    delete       { @post.destroy; halt :ok }
-    put {
+      delete       { @post.destroy; halt :ok }
+      post {
+        puts  "inputputput"
         @post.title    = request['title']    if request['title']
         @post.contents = request['contents'] if request['contents']
         halt @post.save ? :ok : :error
@@ -19,9 +21,10 @@ class MyApp < Renee::Application
     end
 
     post {
+      puts "in post!"
       if request['title'] && request['contents']
-        Post.create(title: request['title'], contents: request['contents'])
-        halt :created
+        p=Post.create(title: request['title'], contents: request['contents'])
+        redirect "/#{p.id}"
       else
         halt :bad_request
       end

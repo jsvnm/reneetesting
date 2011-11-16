@@ -1,18 +1,18 @@
-require 'dm-core'
-require 'dm-migrations' 
-require 'dm-timestamps'
+require 'sequel'
 
-DataMapper::Logger.new($stdout, :debug)
-DataMapper.setup(:default, "sqlite://#{File.dirname(__FILE__)}/project.db")
+Sequel::Model.plugin :schema
+Sequel::Model.plugin :timestamps
 
-class Post
-  include DataMapper::Resource
-  
-  property :id,         Serial  
-  property :title,      String  
-  property :contents,   Text    
-  timestamps :at
+DB = Sequel.connect('sqlite://test.db')
+
+class Post < Sequel::Model
+  set_schema do
+    primary_key :id
+    varchar     :title
+    String      :contents
+    timestamp   :created_at
+    timestamp   :updated_at
+  end
+  create_table unless table_exists?
 end
 
-# DataMapper.auto_migrate! #destructive
-DataMapper.auto_upgrade! #non-destructive
