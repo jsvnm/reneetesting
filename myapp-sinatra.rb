@@ -43,12 +43,9 @@ class MyApp < Sinatra::Base
   
     
   post '/' do
-    if(request['title'] && request['contents'])
-      p=Post.create(title: request['title'], contents: request['contents'])
-      redirect to("/#{p.id}"), :ok
-    else
-      redirect to("/"), "Error when creating"
-    end
+    p=Post.create_from_hash(params["post"])
+    p ? redirect(to("/#{p.id}"), :ok)
+      : redirect(to("/"), "Error when creating")
   end
     
   get "/" do
@@ -86,11 +83,11 @@ html
 br
 #post
 form action=url("/") method="post"
-  label for="title" Title
-  input name="title"
+  label for="post[title]" Title
+  input name="post[title]"
   br
-  label for="contents" Contents
-  textarea name="contents"
+  label for="post[contents]" Contents
+  textarea name="post[contents]"
   br
   input type="submit" value="Create"
 javascript:
