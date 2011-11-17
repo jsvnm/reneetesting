@@ -17,30 +17,31 @@ class MyApp < Sinatra::Base
   get('/styles.css'){ content_type 'text/css', :charset => 'utf-8' ; scss :styles }
 
 
-  before %r{^/([\d]+)(?:/.*)*} do |id|
-    halt(404, "Nothing found with id #{id}") unless @post = Post[id]
-  end
+  namespace %r{^/(?<id>[\d]+)(?:/.*)?} do |id|
 
-  get %r{^/([\d]+)/edit} do
-    slim :edit
-  end
+    before do
+      id=params["id"]
+      halt(404, "Nothing found with id #{id}") unless @post = Post[id]
+    end
+    
+    get('/edit/?') { slim :edit }
+    get('/?')      { slim :show }
+    
+    put('/?') do
+      @post.title    = request['title']    if request['title']
+      @post.contents = request['contents'] if request['contents']
+      @post.save     ? redirect(to("/#{@post.id}")) 
+                     : redirect(back)
+    end
+    
+    delete('/?') do
+      @post.destroy
+      redirect to("/")
+    end
 
-  get %r{^/([\d]+)} do
-    slim :show
   end
   
-  put %r{^/([\d]+)/?} do
-    @post.title    = request['title']    if request['title']
-    @post.contents = request['contents'] if request['contents']
-    @post.save     ? redirect(to("/#{@post.id}")) 
-                   : redirect(back)
-  end
-  
-  delete %r{^/([\d]+)/?} do
-    @post.destroy
-    redirect to("/")
-  end
-  
+    
   post '/' do
     if(request['title'] && request['contents'])
       p=Post.create(title: request['title'], contents: request['contents'])
@@ -66,6 +67,7 @@ html
     title= @title || "sinatra > renee"
     /  /// link rel="shortcut icon" href="/fav.ico" 
     link rel="stylesheet" media="screen, projection" href="/styles.css"
+    script src="http://rightjs.org/hotlink/right.js"
     /[if lt IE 9]
       script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"
   body
@@ -78,21 +80,28 @@ html
 - for post in @posts do
   p 
     | Title:
-    a href=url("/#{post.id}") = post.title
+    a.showpost href=url("/#{post.id}") = post.title
     br
     = post.contents
 br
+#post
 form action=url("/") method="post"
-  | Title
+  label for="title" Title
   input name="title"
   br
+  label for="contents" Contents
   textarea name="contents"
   br
   input type="submit" value="Create"
+javascript:
+  ".showpost".onClick(function(event) {
+    event.stop();
+    $('post').load(this.get('href'));
+  });
 
 
 @@edit
-form action="/#{@post.id}" method="post"
+form#form action="/#{@post.id}" method="post"
   input type="hidden" name="_method" value="put"
   | Title
   input name="title" value=@post.title
@@ -100,7 +109,8 @@ form action="/#{@post.id}" method="post"
   textarea name="contents" = @post.contents
   br
   input type="submit" value="Update"
-
+javascript:
+  $('form').remotize();
 
 @@show
 h1 = @post.title        
@@ -116,8 +126,8 @@ body{font: 13px/27px Arial,sans-serif;}
 
 h1{font-size:28px;color:blue;line-height:2;}
 
-form{width:280px;margin:0 auto;}
-#page{width:480px;margin:0 auto;}
+form{width:400px;margin:0 auto;}
+form label {float:left; font-size:13px; width:110px; }
 
 #google{background:#2d2d2d;overflow:hidden;
 li{float:left;display:inline;list-style-type:none;margin:0;line-height:27px;}
