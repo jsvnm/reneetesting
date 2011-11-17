@@ -2,6 +2,7 @@ require 'sequel'
 
 Sequel::Model.plugin :schema
 Sequel::Model.plugin :timestamps
+Sequel::Model.plugin :crushyform
 
 DB = Sequel.connect('sqlite://test.db')
 
