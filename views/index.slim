@@ -1,0 +1,23 @@
+- if @posts.empty?
+  p No posts, create some!
+- for post in @posts do
+  p
+    | Title:
+    a.showpost href=url("/#{post.id}") = post.title
+    br
+    = post.contents
+br
+#post
+form action=url("/") method="post"
+  label for="post[title]" Title
+  input name="post[title]"
+  br
+  label for="post[contents]" Contents
+  textarea name="post[contents]"
+  br
+  input type="submit" value="Create"
+javascript:
+  ".showpost".onClick(function(event) {
+    event.stop();
+    $('post').load(this.get('href'));
+  });

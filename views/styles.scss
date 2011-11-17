@@ -1,0 +1,23 @@
+html,body,div,span,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote, pre,abbr,address,cite,code,del,dfn,em,img,ins,kbd,q,samp,small,strong,sub,sup,var,b,i,dl,dt, dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article, aside, canvas, details,figcaption,figure,footer,header,hgroup,menu,nav,section, summary,time,mark,audio,video{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent;line-height:1;}
+body{font: 13px/27px Arial,sans-serif;}
+
+#logo{width:280px;display:block;margin:10px auto;}
+
+h1{font-size:28px;color:blue;line-height:2;}
+
+form{width:400px;margin:0 auto;}
+form label {float:left; font-size:13px; width:110px; }
+
+#google{background:#2d2d2d;overflow:hidden;
+li{float:left;display:inline;list-style-type:none;margin:0;line-height:27px;}
+li a,li a:link{padding:0 5px;text-decoration:none;display:block;
+color:white;border-top:2px solid transparent;}
+li a:hover{background:#4d4d4d;}
+li a.current{font-weight:bold;border-top-color:#DD4B39;}}
+
+#footer{
+overflow:hidden;;padding:10px;width:300px;margin:100px auto 0;
+li{float:left;display:inline;list-style-type:none;margin:0;font-weight:bold;color:#DD4B39;}
+li a,li a:link{padding:0 5px;text-decoration:none;display:block;
+color:blue;font-weight:normal;}
+li a:hover{text-decoration:underline;}}

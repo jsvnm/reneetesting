@@ -1,5 +1,5 @@
 $: << File.dirname(__FILE__)
-require 'myapp-sinatra'
+require 'myapp'
 require 'rack/bug'
 
 use Rack::CommonLogger
