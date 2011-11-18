@@ -16,19 +16,18 @@ class MyApp < Sinatra::Base
     Compass.add_project_configuration(File.join(root, 'config', 'compass.config'))
   end
 
-  get '/stylesheets/:name.css' do
-    content_type 'text/css', :charset => 'utf-8'
+  get('/stylesheets/:name.css') do
+    content_type('text/css', :charset => 'utf-8')
     scss(:"stylesheets/#{params[:name]}", Compass.sass_engine_options )
   end
-
-  get('/styles.css'){ content_type 'text/css', :charset => 'utf-8' ; scss :styles }
 
 
   namespace %r{^/(?<id>[\d]+)(?:/.*)?} do |id|
 
     before do
       id=params["id"]
-      halt(404, "Nothing found with id #{id}") unless @post = Post[id]
+      halt(404, "Nothing found with id #{id}") unless @post ||= Post[id]
+      puts @post.inspect
     end
 
     get('/edit/?') { @post.to_form("/#{@post.id}", "put") }
@@ -36,9 +35,9 @@ class MyApp < Sinatra::Base
     get('/?')      { slim :show }
 
     put('/?') do
-      (@post.update_fields(params["model"].symbolize_keys, [:title, :contents]) \
+      @post.update_fields(params["model"].symbolize_keys, [:title, :contents]) \
        ? redirect(to("/#{@post.id}"))
-       : redirect(back))
+       : halt(@post.to_form("/#{@post.id}", "put"))
     end
 
     delete('/?') do
@@ -50,9 +49,9 @@ class MyApp < Sinatra::Base
 
 
   post '/' do
-    p=Post.create_from_hash(params["post"])
-    p ? redirect(to("/#{p.id}"), :ok)
-      : redirect(to("/"), "Error when creating")
+    @post = Post.new
+    @post.update(params["post"]) ? redirect(to("/#{@post.id}"), :ok)
+                                 : halt(@post.to_form())
   end
 
   get "/" do

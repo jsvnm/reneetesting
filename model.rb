@@ -3,6 +3,7 @@ require 'sequel'
 Sequel::Model.plugin :schema
 Sequel::Model.plugin :timestamps
 Sequel::Model.plugin :crushyform
+Sequel::Model.plugin :validation_helpers
 
 DB = Sequel.connect('sqlite://test.db')
 
@@ -19,11 +20,16 @@ class Post < Sequel::Model
   set_schema do
     primary_key :id
     varchar     :title
-    String      :contents
+    text        :contents
     timestamp   :created_at
     timestamp   :updated_at
   end
   create_table unless table_exists?
+
+  def validate
+    validates_min_length 3, :title
+    validates_min_length 15, :contents
+  end
 
   def self.columns_rw; [:title, :contents]; end
 
@@ -46,4 +52,6 @@ class Post < Sequel::Model
 
   method_to_instance :columns_rw
 end
+
+Post.raise_on_save_failure=false
 

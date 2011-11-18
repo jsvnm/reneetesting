@@ -9,7 +9,7 @@ section.posts
       p = post.contents
 br
 #post
-form action==url("/") method="post"
+form#form-create action==url("/") method="post"
   label for="post[title]" Title
   input name="post[title]"
   br
@@ -21,4 +21,9 @@ javascript:
   ".showpost".onClick(function(event) {
     event.stop();
     $('post').load(this.get('href'));
+  });
+  $("form-create").remotize({
+    onComplete: function(request) {
+      $("form-create").html(request.responseText);
+    }
   });
