@@ -1,8 +1,9 @@
 require 'json'
-require 'slim'
-require 'sass'
+require 'compass'
 require 'sinatra/base'
 require "sinatra/namespace"
+require 'slim'
+require 'sass'
 
 require 'model'
 
@@ -12,6 +13,12 @@ class MyApp < Sinatra::Base
     set :slim, :pretty => true
     #enable :inline_templates
     enable :method_override
+    Compass.add_project_configuration(File.join(root, 'config', 'compass.config'))
+  end
+
+  get '/stylesheets/:name.css' do
+    content_type 'text/css', :charset => 'utf-8'
+    scss(:"stylesheets/#{params[:name]}", Compass.sass_engine_options )
   end
 
   get('/styles.css'){ content_type 'text/css', :charset => 'utf-8' ; scss :styles }
