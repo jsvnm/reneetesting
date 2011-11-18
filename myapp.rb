@@ -16,6 +16,14 @@ class MyApp < Sinatra::Base
     Compass.add_project_configuration(File.join(root, 'config', 'compass.config'))
   end
 
+  helpers do
+    def render_each(template, collection, as=:item)
+      buf = []
+      collection.each { |item| buf << slim(template, layout:false, locals:{as => item}) }
+      buf.join("\n")
+    end
+  end
+
   get('/stylesheets/:name.css') do
     content_type('text/css', :charset => 'utf-8')
     scss(:"stylesheets/#{params[:name]}", Compass.sass_engine_options )

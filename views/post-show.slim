@@ -1,0 +1,5 @@
+article.post id="post-#{post.id}"
+  header
+    | Title:
+    a.showpost href==url("/#{post.id}") = post.title
+  p = post.contents

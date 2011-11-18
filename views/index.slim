@@ -1,13 +1,8 @@
 section.posts
   - if @posts.empty?
     p No posts, create some!
-  - for post in @posts do
-    article.post id="post-#{post.id}"
-      header
-        | Title:
-        a.showpost href==url("/#{post.id}") = post.title
-      p = post.contents
-br
+  == render_each(:'post-show', @posts, :post)
+
 #post
 form#form-create action==url("/") method="post"
   label for="post[title]" Title
