@@ -9,14 +9,20 @@
 @import "compass/reset";
 @import "compass/utilities";
 
+$posts-bg: #9cbc2c;
+$post-bg: adjust-lightness($posts-bg, 30);
+
 section.posts {
-  background: #7c9c0c;
+  background: $posts-bg;
   width: 400px;
+  float: left;
   padding: 10px;
-  @include border-radius(25px);
+  @include border-radius(15px);
 
   .post {
-    background: #9cbc2c;
+    @include background-image(linear-gradient(adjust-lightness($post-bg, 30),
+                                              $post-bg,
+                                              adjust-lightness($post-bg, -20) ));
     margin: 5px;
     padding: 5px;
     @include border-radius(15px);
