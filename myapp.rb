@@ -7,10 +7,16 @@ require 'sass'
 
 require 'model'
 
+class Vamma < Sinatra::Base
+  get('/login') { halt "Access denied, please <a href='/login'>login</a>." }
+end
+
+
 class MyApp < Sinatra::Base
+  use Vamma
   register Sinatra::Namespace
   configure do
-    set :slim, :pretty => true
+    set :slim, {:pretty => true} #, :sections => true}
     #enable :inline_templates
     enable :method_override
     Compass.add_project_configuration(File.join(root, 'config', 'compass.config'))
@@ -36,9 +42,11 @@ class MyApp < Sinatra::Base
     get('/?')      { slim :show }
 
     put('/?') do
-      (@post.update_fields(params["model"].symbolize_keys, [:title, :contents]) \
-       ? redirect(to("/#{@post.id}"))
-       : redirect(back))
+      if @post.update_fields(params["model"].symbolize_keys, [:title, :contents])
+        redirect(to("/#{@post.id}"))
+      else
+        @post.to_form("/#{@post.id}", "put")
+      end
     end
 
     delete('/?') do
@@ -48,14 +56,16 @@ class MyApp < Sinatra::Base
 
   end
 
-
-  post '/' do
-    p=Post.create_from_hash(params["post"])
-    p ? redirect(to("/#{p.id}"), :ok)
-      : redirect(to("/"), "Error when creating")
+  post('/') do
+    @post=Post.new
+    if @post.update_fields(params["model"].symbolize_keys, [:title, :contents]) 
+      redirect(to("/#{@post.id}"))
+    else
+      @post.to_form("/#{@post.id}", "put")
+    end
   end
 
-  get "/" do
+  get('/') do
     @posts = Post.all
     slim :index
   end
