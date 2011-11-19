@@ -7,27 +7,27 @@ require 'sass'
 
 require 'model'
 
-class Vamma < Sinatra::Base
-  get('/login') { halt "Access denied, please <a href='/login'>login</a>." }
-end
-
-
 class MyApp < Sinatra::Base
-  use Vamma
   register Sinatra::Namespace
   configure do
-    set :slim, {:pretty => true} #, :sections => true}
+    set :slim, :pretty => true
     #enable :inline_templates
     enable :method_override
     Compass.add_project_configuration(File.join(root, 'config', 'compass.config'))
   end
 
-  get '/stylesheets/:name.css' do
-    content_type 'text/css', :charset => 'utf-8'
-    scss(:"stylesheets/#{params[:name]}", Compass.sass_engine_options )
+  helpers do
+    def render_each(template, collection, as=:item)
+      buf = []
+      collection.each { |item| buf << slim(template, layout:false, locals:{as => item}) }
+      buf.join("\n")
+    end
   end
 
-  get('/styles.css'){ content_type 'text/css', :charset => 'utf-8' ; scss :styles }
+  get('/stylesheets/:name.css') do
+    content_type('text/css', :charset => 'utf-8')
+    scss(:"stylesheets/#{params[:name]}", Compass.sass_engine_options )
+  end
 
 
   namespace %r{^/(?<id>[\d]+)(?:/.*)?} do |id|
@@ -42,11 +42,9 @@ class MyApp < Sinatra::Base
     get('/?')      { slim :show }
 
     put('/?') do
-      if @post.update_fields(params["model"].symbolize_keys, [:title, :contents])
-        redirect(to("/#{@post.id}"))
-      else
-        @post.to_form("/#{@post.id}", "put")
-      end
+      @post.update_fields(params["model"].symbolize_keys, [:title, :contents]) \
+       ? redirect(to("/#{@post.id}"))
+       : halt(@post.to_form("/#{@post.id}", "put"))
     end
 
     delete('/?') do
@@ -56,13 +54,11 @@ class MyApp < Sinatra::Base
 
   end
 
-  post('/') do
-    @post=Post.new
-    if @post.update_fields(params["model"].symbolize_keys, [:title, :contents]) 
-      redirect(to("/#{@post.id}"))
-    else
-      @post.to_form("/#{@post.id}", "put")
-    end
+
+  post '/' do
+    @post = Post.new
+    @post.update(params["model"]) ? redirect(to("/#{@post.id}"), :ok)
+                                  : halt(@post.to_form())
   end
 
   get('/') do
